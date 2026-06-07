@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar.jsx';
 import Dashboard from './Dashboard.jsx';
 import Topbar from './Topbar.jsx';
@@ -12,6 +12,17 @@ export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [cmdOpen, setCmdOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCmdOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   // We normally lift state up, but for the prototype we'll listen to CustomEvents
   // if Dashboard is not unmounted. Or we can just let Dashboard handle its own data.

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Topbar.css';
 
-export default function Topbar({ activeView, toggleNotifications, hasUnreadNotifications, aoi, annualData, stockData }) {
+export default function Topbar({ activeView, toggleNotifications, onOpenCmd, hasUnreadNotifications, aoi, annualData, stockData }) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function Topbar({ activeView, toggleNotifications, hasUnreadNotif
           {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </div>
         
-        <button className="topbar-action-btn search-btn" onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'k', 'ctrlKey': true}))} title="Command Palette (Ctrl+K)">
+        <button className="topbar-action-btn search-btn" onClick={onOpenCmd} title="Command Palette (Ctrl+K)">
           <span className="icon">🔍</span>
           <span className="shortcut">Ctrl+K</span>
         </button>

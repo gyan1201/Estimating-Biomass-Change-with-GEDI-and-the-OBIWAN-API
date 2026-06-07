@@ -249,6 +249,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
     <div className="dashboard" style={{ display: activeView === 'settings' ? 'none' : 'flex' }}>
       <Topbar 
         activeView={activeView}
+        onOpenCmd={onOpenCmd}
         hasUnreadNotifications={false}
         toggleNotifications={onToggleNotif}
         aoi={aoi}
