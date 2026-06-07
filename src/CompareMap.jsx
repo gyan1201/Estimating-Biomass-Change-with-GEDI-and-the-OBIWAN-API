@@ -4,6 +4,7 @@ import {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import api from './api.js';
+import AnimationPlayer from './AnimationPlayer.jsx';
 import './CompareMap.css';
 
 const ALABAMA = [32.806671, -86.791130];
@@ -15,7 +16,6 @@ function SyncSecondary({ primaryRef }) {
   useEffect(() => {
     const primary = primaryRef.current;
     if (!primary) return;
-    // Copy current view immediately
     map.setView(primary.getCenter(), primary.getZoom(), { animate: false });
   }, []);
   return null;
@@ -106,9 +106,10 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
   const primaryRef   = useRef(null);
   const secondaryRef = useRef(null);
 
-  const [drawing, setDrawing]           = useState(false);
-  const [aoiPoints, setAoiPoints]       = useState(null);
-  const [biomassYear, setBiomassYear]   = useState(2021);
+  const [drawing, setDrawing]     = useState(false);
+  const [aoiPoints, setAoiPoints] = useState(null);
+  const [yearA, setYearA]         = useState(1999);
+  const [yearB, setYearB]         = useState(2023);
 
   const handleFinish = useCallback((fc, pts) => {
     setAoiPoints(pts);
@@ -119,129 +120,126 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
   const clearAoi = () => { setAoiPoints(null); if (onAoiChange) onAoiChange(null); };
 
   return (
-    <div className="compare-root">
-      {/* ── Controls Bar ── */}
-      <div className="compare-bar glass">
-        <div className="compare-labels">
-          <span className="compare-label left-label">🗺️ Reference Map (Street)</span>
-          <span className="compare-divider-label">← COMPARE →</span>
-          <span className="compare-label right-label">🛰️ OBIWAN Biomass Overlay</span>
-        </div>
-        <div className="compare-controls">
-          <label className="ctrl-lbl">Biomass Year:</label>
-          <select
-            value={biomassYear}
-            onChange={e => setBiomassYear(+e.target.value)}
-            className="yr-select"
-          >
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            <option value={2023}>2023</option>
-          </select>
+    <div className="compare-root" style={{ display: 'flex', flexDirection: 'column' }}>
+      <AnimationPlayer useCalibration={useCalibration} onAnimating={() => {}}>
+        {({ mode, currentUrl, tileCache, currentYear, validYears }) => {
+          const isAnimating = mode === 'ready' || mode === 'loading';
 
-          {!drawing && !aoiPoints && (
-            <button className="compare-draw-btn" onClick={() => setDrawing(true)}>
-              ✏️ Draw AOI
-            </button>
-          )}
-          {drawing && (
-            <span className="compare-hint">Left-click: add point · Right-click: finish</span>
-          )}
-          {aoiPoints && (
-            <button className="compare-clear-btn" onClick={clearAoi}>✕ Clear AOI</button>
-          )}
-        </div>
-      </div>
+          return (
+            <>
+              {/* ── Controls Bar ── */}
+              <div className="compare-bar glass">
+                <div className="compare-labels">
+                  <span className="compare-label left-label">🗺️ Baseline: {yearA}</span>
+                  <span className="compare-divider-label">← COMPARE →</span>
+                  <span className="compare-label right-label">
+                    {isAnimating ? `🌳 Animating Biomass` : `🛰️ Target: ${yearB}`}
+                  </span>
+                </div>
+                
+                {/* Year Selectors (only visible when not animating) */}
+                <div className="compare-controls">
+                  {!isAnimating && (
+                    <>
+                      <label className="ctrl-lbl">Left Year:</label>
+                      <select value={yearA} onChange={e => setYearA(+e.target.value)} className="yr-select">
+                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
 
-      {/* ── Two Maps Side by Side ── */}
-      <div className="compare-maps">
-        {/* LEFT — Street Reference Map */}
-        <div className="map-half left-half">
-          <div className="map-badge left-badge">Street / Reference</div>
-          <MapContainer
-            center={ALABAMA}
-            zoom={8}
-            zoomControl={true}
-            style={{ width: '100%', height: '100%' }}
-            ref={primaryRef}
-          >
-            {/* OpenStreetMap tile — looks like Google Maps style */}
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png"
-              attribution="&copy; CartoDB"
-              maxZoom={19}
-            />
-            {/* Also show a road overlay */}
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
-              opacity={0.4}
-              maxZoom={19}
-            />
-            <SyncPrimary secondaryRef={secondaryRef} />
-            <FlyBtn />
-            <DrawTool onFinish={handleFinish} drawing={drawing} />
-            {aoiPoints && (
-              <Polygon
-                positions={aoiPoints}
-                pathOptions={{ color: '#F59E0B', fillColor: '#F59E0B', fillOpacity: 0.15, weight: 2 }}
-              />
-            )}
-          </MapContainer>
-        </div>
+                      <label className="ctrl-lbl">Right Year:</label>
+                      <select value={yearB} onChange={e => setYearB(+e.target.value)} className="yr-select">
+                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </>
+                  )}
 
-        {/* DIVIDER */}
-        <div className="compare-divider">
-          <div className="divider-line" />
-          <div className="divider-handle">⇔</div>
-          <div className="divider-line" />
-        </div>
+                  {!drawing && !aoiPoints && !isAnimating && (
+                    <button className="compare-draw-btn" onClick={() => setDrawing(true)}>
+                      ✏️ Draw AOI
+                    </button>
+                  )}
+                  {drawing && (
+                    <span className="compare-hint">Left-click: add point · Right-click: finish</span>
+                  )}
+                  {aoiPoints && (
+                    <button className="compare-clear-btn" onClick={clearAoi}>✕ Clear AOI</button>
+                  )}
+                </div>
+              </div>
 
-        {/* RIGHT — Satellite + OBIWAN Biomass */}
-        <div className="map-half right-half">
-          <div className="map-badge right-badge">GEDI Biomass · {biomassYear}</div>
-          <MapContainer
-            center={ALABAMA}
-            zoom={8}
-            zoomControl={false}
-            style={{ width: '100%', height: '100%' }}
-            ref={secondaryRef}
-          >
-            {/* Satellite base */}
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              attribution="Esri World Imagery"
-            />
-            {/* OBIWAN biomass overlay */}
-            <BiomassTile year={biomassYear} useCalibration={useCalibration} />
-            <SyncSecondary primaryRef={primaryRef} />
-            <SyncBack primaryRef={primaryRef} />
-            {aoiPoints && (
-              <Polygon
-                positions={aoiPoints}
-                pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.15, weight: 2 }}
-              />
-            )}
-          </MapContainer>
-        </div>
-      </div>
+              {/* ── Two Maps Side by Side ── */}
+              <div className="compare-maps" style={{ flex: 1, display: 'flex', position: 'relative' }}>
+                
+                {/* LEFT — Baseline Map */}
+                <div className="map-half left-half" style={{ flex: 1, position: 'relative' }}>
+                  <div className="map-badge left-badge">Baseline: {yearA}</div>
+                  <MapContainer
+                    center={ALABAMA}
+                    zoom={8}
+                    zoomControl={true}
+                    style={{ width: '100%', height: '100%' }}
+                    ref={primaryRef}
+                  >
+                    <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                    <BiomassTile year={yearA} useCalibration={useCalibration} />
+                    
+                    <SyncPrimary secondaryRef={secondaryRef} />
+                    <FlyBtn />
+                    <DrawTool onFinish={handleFinish} drawing={drawing} />
+                    {aoiPoints && (
+                      <Polygon
+                        positions={aoiPoints}
+                        pathOptions={{ color: '#F59E0B', fillColor: '#F59E0B', fillOpacity: 0.15, weight: 2 }}
+                      />
+                    )}
+                  </MapContainer>
+                </div>
 
-      {/* Legend */}
-      <div className="compare-legend glass">
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#10B981' }} />
-          High Biomass
-        </span>
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#F59E0B' }} />
-          Medium Biomass
-        </span>
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#EF4444' }} />
-          Low Biomass
-        </span>
-        <span className="legend-sep">|</span>
-        <span className="legend-text">Powered by NASA GEDI L4B via OBIWAN API · {biomassYear}</span>
-      </div>
+                {/* DIVIDER */}
+                <div className="compare-divider" style={{ width: '4px', background: '#334155', zIndex: 1000 }}>
+                  <div className="divider-line" />
+                  <div className="divider-handle">⇔</div>
+                  <div className="divider-line" />
+                </div>
+
+                {/* RIGHT — Target / Animated Map */}
+                <div className="map-half right-half" style={{ flex: 1, position: 'relative' }}>
+                  <div className="map-badge right-badge">
+                    {isAnimating ? `Animation: ${currentYear || '...'}` : `Target: ${yearB}`}
+                  </div>
+                  <MapContainer
+                    center={ALABAMA}
+                    zoom={8}
+                    zoomControl={false}
+                    style={{ width: '100%', height: '100%' }}
+                    ref={secondaryRef}
+                  >
+                    <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                    
+                    {/* Render Animation Layers OR Static Year B */}
+                    {mode === 'ready' ? (
+                      validYears.map(y => (
+                        <TileLayer key={y} url={tileCache[y]} opacity={y === currentYear ? 0.65 : 0} zIndex={10} />
+                      ))
+                    ) : (
+                      <BiomassTile year={yearB} useCalibration={useCalibration} />
+                    )}
+
+                    <SyncSecondary primaryRef={primaryRef} />
+                    <SyncBack primaryRef={primaryRef} />
+                    {aoiPoints && (
+                      <Polygon
+                        positions={aoiPoints}
+                        pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.15, weight: 2 }}
+                      />
+                    )}
+                  </MapContainer>
+                </div>
+              </div>
+            </>
+          );
+        }}
+      </AnimationPlayer>
     </div>
   );
 }
