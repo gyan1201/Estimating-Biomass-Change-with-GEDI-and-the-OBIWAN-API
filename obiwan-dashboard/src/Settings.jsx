@@ -16,7 +16,7 @@ export default function Settings() {
     <div className="settings-wrapper fade-in">
       <div className="settings-header glass">
         <h2>Workspace Settings</h2>
-        <p>Configure your EdgeMind Forest preferences and defaults.</p>
+        <p>Configure your BioTrace AI preferences and defaults.</p>
       </div>
 
       <div className="settings-body">

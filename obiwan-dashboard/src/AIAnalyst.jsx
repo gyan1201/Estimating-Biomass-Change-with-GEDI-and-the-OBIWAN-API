@@ -109,7 +109,7 @@ export default function AIAnalyst({ aoi, annualData, stockData, changeData }) {
         <div className="ai-title-row">
           <div className="ai-avatar">🧠</div>
           <div>
-            <h2 className="ai-title">EdgeMind AI Analyst</h2>
+            <h2 className="ai-title">BioTrace AI Analyst</h2>
             <p className="ai-subtitle">Automated telemetry & anomaly detection</p>
           </div>
         </div>

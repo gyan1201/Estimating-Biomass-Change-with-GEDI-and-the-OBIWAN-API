@@ -89,17 +89,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   const forecastMode = activeView === 'forecast';
   const isDashboard = activeView === 'dashboard';
 
-  // Command Palette Listener
-  useEffect(() => {
-    const handleCmdAction = (e) => {
-      const action = e.detail;
-      if (action === 'toggle-cal') setUseCalibration(c => !c);
-      else if (action === 'export-csv') handleExportCSV();
-      else if (action === 'export-json') handleExportJSON();
-    };
-    document.addEventListener('cmd-action', handleCmdAction);
-    return () => document.removeEventListener('cmd-action', handleCmdAction);
-  }, [annualData, stockData]);
+
 
   // Biomass map overlay
   const [biomassYear, setBiomassYear] = useState(2021);
@@ -122,12 +112,24 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   const [loadingChange, setLoadingChange] = useState(false);
 
   // Additionality
-  const [addBaseStart, setAddBaseStart] = useState(1999);
-  const [addBaseEnd, setAddBaseEnd] = useState(2005);
-  const [addTargetStart, setAddTargetStart] = useState(2015);
+  const [addBaseStart, setAddBaseStart] = useState(2010);
+  const [addBaseEnd, setAddBaseEnd] = useState(2015);
+  const [addTargetStart, setAddTargetStart] = useState(2016);
   const [addTargetEnd, setAddTargetEnd] = useState(2021);
   const [additionalityData, setAdditionalityData] = useState(null);
   const [loadingAdd, setLoadingAdd] = useState(false);
+
+  // Command Palette Listener
+  useEffect(() => {
+    const handleCmdAction = (e) => {
+      const action = e.detail;
+      if (action === 'toggle-cal') setUseCalibration(c => !c);
+      else if (action === 'export-csv') handleExportCSV();
+      else if (action === 'export-json') handleExportJSON();
+    };
+    document.addEventListener('cmd-action', handleCmdAction);
+    return () => document.removeEventListener('cmd-action', handleCmdAction);
+  }, [annualData, stockData]);
 
   const [error, setError] = useState(null);
 
@@ -206,7 +208,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `edgemind-data-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `biotrace-data-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
   };
 
@@ -222,7 +224,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `edgemind-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `biotrace-data-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
   };
 

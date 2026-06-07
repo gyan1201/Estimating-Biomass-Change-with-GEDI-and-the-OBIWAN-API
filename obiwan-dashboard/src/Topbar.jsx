@@ -40,7 +40,7 @@ export default function Topbar({ activeView, toggleNotifications, hasUnreadNotif
   return (
     <div className="topbar glass">
       <div className="topbar-left">
-        <h1 className="view-title">{viewTitles[activeView] || 'EdgeMind Forest'}</h1>
+        <h1 className="view-title">{viewTitles[activeView] || 'BioTrace AI'}</h1>
         <div className="api-status">
           <span className="status-dot healthy"></span>
           <span className="status-text">OBIWAN API Online</span>

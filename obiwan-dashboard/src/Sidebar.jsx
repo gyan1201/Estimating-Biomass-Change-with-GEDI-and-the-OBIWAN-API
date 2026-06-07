@@ -1,7 +1,7 @@
 import React from 'react';
 import './Sidebar.css';
 
-export default function Sidebar({ activeView, setActiveView, workspaceName = "EdgeMind Forest" }) {
+export default function Sidebar({ activeView, setActiveView, workspaceName = "BioTrace AI" }) {
   const navItems = [
     { id: 'dashboard', icon: '🌍', label: 'Map Dashboard' },
     { id: 'ai-analyst', icon: '🧠', label: 'AI Analyst' },

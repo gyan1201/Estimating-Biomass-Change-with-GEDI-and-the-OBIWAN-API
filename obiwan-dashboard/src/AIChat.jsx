@@ -4,7 +4,7 @@ import './AIChat.css';
 export default function AIChat({ aoi, annualData, stockData }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'ai', text: "Hello! I'm your EdgeMind Forest Assistant. Draw an AOI and ask me anything about the biomass data, trends, or carbon stock." }
+    { role: 'ai', text: "Hello! I'm your BioTrace AI Assistant. Draw an AOI and ask me anything about the biomass data, trends, or carbon stock." }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -101,7 +101,7 @@ export default function AIChat({ aoi, annualData, stockData }) {
           <div className="chat-title">
             <span className="chat-avatar">🤖</span>
             <div>
-              <h4>EdgeMind Assistant</h4>
+              <h4>BioTrace AI</h4>
               <span className="chat-status">Online</span>
             </div>
           </div>
