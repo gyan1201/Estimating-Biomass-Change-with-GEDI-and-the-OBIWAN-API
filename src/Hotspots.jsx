@@ -2,19 +2,23 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-// Create custom emoji icons to avoid Vite asset bundling issues
-const createIcon = (emoji) => L.divIcon({
-  html: `<div style="font-size: 24px; background: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${emoji}</div>`,
-  className: 'custom-hotspot-icon',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -16]
+const createIcon = (type, svg) => L.divIcon({
+  html: `
+    <div class="hotspot-marker hotspot-${type}">
+      ${svg}
+      <div class="pulse-ring"></div>
+    </div>
+  `,
+  className: 'custom-hotspot-container',
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14]
 });
 
 const icons = {
-  loss: createIcon('🔥'),
-  gain: createIcon('🌱'),
-  mixed: createIcon('🔄')
+  loss: createIcon('loss', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>'),
+  gain: createIcon('gain', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'),
+  mixed: createIcon('mixed', '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>')
 };
 
 const HOTSPOTS = [
@@ -55,7 +59,7 @@ export function HotspotMarkers({ onSelect }) {
           <Popup>
             <div style={{ padding: '4px', textAlign: 'center' }}>
               <strong style={{ display: 'block', fontSize: '14px', marginBottom: '4px' }}>
-                {h.type === 'loss' ? '🔥' : h.type === 'gain' ? '🌱' : '🔄'} {h.name}
+                {h.name}
               </strong>
               <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>{h.desc}</p>
               {onSelect && (
