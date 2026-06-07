@@ -8,20 +8,7 @@ import './Map.css';
 // Alabama center coordinates
 const ALABAMA = [32.806671, -86.791130];
 
-// Button inside the map to fly to Alabama
-function FlyToAlabama() {
-  const map = useMap();
-  return (
-    <div
-      style={{ position: 'absolute', top: 70, right: 12, zIndex: 1000 }}
-      onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}
-    >
-      <button className="map-btn primary">
-        ✈ Fly to Alabama
-      </button>
-    </div>
-  );
-}
+
 
 // Overlay for biomass tiles coming from the API — hidden when animation is active
 function BiomassTileLayer({ url, hidden }) {
@@ -62,6 +49,35 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
   );
 }
 
+function BottomLeftControls({ drawing, setDrawing, finishedPoints, clearAoi }) {
+  const map = useMap();
+  return (
+    <div className="map-controls" style={{ position: 'absolute', bottom: 30, left: 12, top: 'auto', zIndex: 1000, display: 'flex', gap: '8px', alignItems: 'center' }}>
+      {!drawing && !finishedPoints && (
+        <button className="map-btn primary" onClick={() => setDrawing(true)}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          Draw AOI
+        </button>
+      )}
+      {drawing && (
+        <span className="map-hint">
+          Left-click to add points · Right-click to finish ({'>'}2 points needed)
+        </span>
+      )}
+      {finishedPoints && (
+        <button className="map-btn danger" onClick={clearAoi}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Clear Selection
+        </button>
+      )}
+
+      <button className="map-btn primary" onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}>
+        ✈ Fly to Alabama
+      </button>
+    </div>
+  );
+}
+
 export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
   const [drawing, setDrawing] = useState(false);
   const [finishedPoints, setFinishedPoints] = useState(null);
@@ -88,27 +104,7 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
 
   return (
     <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Controls Overlay */}
-      <div className="map-controls" style={{ position: 'absolute', zIndex: 1000, top: 12, left: 12 }}>
-        {!drawing && !finishedPoints && (
-          <button className="map-btn primary" onClick={() => setDrawing(true)}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            Draw AOI
-          </button>
-        )}
-        {drawing && (
-          <span className="map-hint">
-            Left-click to add points · Right-click to finish ({'>'}2 points needed)
-          </span>
-        )}
-        {finishedPoints && (
-          <button className="map-btn danger" onClick={clearAoi}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Clear Selection
-          </button>
-        )}
 
-      </div>
 
       <MapContainer center={ALABAMA} zoom={7} zoomControl={true} style={{ height: '100%', width: '100%' }}>
         <LayersControl position="topright">
@@ -152,7 +148,12 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
           </LayersControl.Overlay>
         </LayersControl>
 
-        <FlyToAlabama />
+        <BottomLeftControls 
+          drawing={drawing} 
+          setDrawing={setDrawing} 
+          finishedPoints={finishedPoints} 
+          clearAoi={clearAoi} 
+        />
         <BiomassTileLayer url={biomassUrl} hidden={false} />
         
         {!drawing && <HotspotMarkers onSelect={selectHotspot} />}
