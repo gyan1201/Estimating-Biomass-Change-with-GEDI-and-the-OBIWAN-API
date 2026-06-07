@@ -11,31 +11,25 @@ function BiomassGradientLegend() {
       background: 'rgba(7, 11, 20, 0.85)',
       backdropFilter: 'blur(8px)',
       border: '1px solid rgba(255,255,255,0.2)',
-      padding: '8px 12px',
+      padding: '6px 16px',
       borderRadius: '8px',
       color: 'white',
       fontSize: '0.75rem',
       display: 'flex',
-      flexDirection: 'column',
-      gap: '4px',
+      gap: '12px',
       alignItems: 'center',
       pointerEvents: 'none',
-      width: '100%',
-      maxWidth: '240px',
-      margin: '0 auto',
       boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
     }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Biomass Density</div>
+      <div style={{ fontWeight: 'bold' }}>Biomass Density</div>
+      <span style={{ opacity: 0.8 }}>Low</span>
       <div style={{
-        width: '100%',
-        height: '10px',
+        width: '120px',
+        height: '8px',
         background: 'linear-gradient(to right, #ffffe5, #d9f0a3, #78c679, #238443, #004529)',
-        borderRadius: '5px'
+        borderRadius: '4px'
       }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', opacity: 0.8 }}>
-        <span>Low</span>
-        <span>High (150+)</span>
-      </div>
+      <span style={{ opacity: 0.8 }}>High (150+)</span>
     </div>
   );
 }
@@ -132,32 +126,16 @@ export default function AnimationPlayer({ useCalibration, onAnimating, children 
 
         {mode === 'ready' && (
           <div className="anim-controls">
-            <div className="anim-year-badge" style={{ borderColor: yearColor(currentYear), color: yearColor(currentYear) }}>
-              <span className="anim-year-label">YEAR</span>
-              <span className="anim-year-num">{currentYear ?? '—'}</span>
-            </div>
-
-            <div className="anim-scrubber">
-              {validYears.map((y, i) => (
-                <button
-                  key={y}
-                  className={`anim-tick ${i === currentIdx ? 'active' : ''}`}
-                  style={i === currentIdx ? { background: yearColor(y) } : {}}
-                  onClick={() => { setCurrentIdx(i); setIsPlaying(false); }}
-                  title={y}
-                />
-              ))}
-            </div>
-
-            <div className="anim-row">
-              <button className="anim-btn ctrl-btn" onClick={() => { setCurrentIdx(0); setIsPlaying(false); }} title="Reset">⏮</button>
+            
+            {/* Left: Playback Controls */}
+            <div className="anim-row" style={{ flexShrink: 0 }}>
               <button className={`anim-btn ctrl-btn play-btn ${isPlaying ? 'active' : ''}`} onClick={() => setIsPlaying(p => !p)}>
                 {isPlaying ? '⏸' : '▶'}
               </button>
               <button className="anim-btn ctrl-btn" onClick={() => { setCurrentIdx(i => Math.max(0, i - 1)); setIsPlaying(false); }} title="Previous">◀</button>
               <button className="anim-btn ctrl-btn" onClick={() => { setCurrentIdx(i => Math.min(validYears.length - 1, i + 1)); setIsPlaying(false); }} title="Next">▶</button>
-
-              <div className="anim-speed">
+              
+              <div className="anim-speed" style={{ marginLeft: 8 }}>
                 <span>🐢</span>
                 <input
                   type="range"
@@ -166,20 +144,43 @@ export default function AnimationPlayer({ useCalibration, onAnimating, children 
                   step={200}
                   value={2800 - speed}
                   onChange={e => setSpeed(2800 - Number(e.target.value))}
+                  style={{ width: '60px' }}
                 />
                 <span>🐇</span>
               </div>
+            </div>
 
+            {/* Middle: Scrubber and Year Badge */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+              <div className="anim-year-badge" style={{ borderColor: yearColor(currentYear), color: yearColor(currentYear), padding: '2px 16px', minWidth: 'auto', flexDirection: 'row', gap: '8px' }}>
+                <span className="anim-year-label">YEAR</span>
+                <span className="anim-year-num" style={{ fontSize: '1.2rem' }}>{currentYear ?? '—'}</span>
+              </div>
+
+              <div className="anim-scrubber">
+                {validYears.map((y, i) => (
+                  <button
+                    key={y}
+                    className={`anim-tick ${i === currentIdx ? 'active' : ''}`}
+                    style={i === currentIdx ? { background: yearColor(y) } : {}}
+                    onClick={() => { setCurrentIdx(i); setIsPlaying(false); }}
+                    title={y}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Legend & Close */}
+            <div className="anim-row" style={{ flexShrink: 0 }}>
+              <BiomassGradientLegend />
               <button
                 className="anim-btn ctrl-btn close-btn"
                 onClick={() => { setMode('idle'); setIsPlaying(false); setTileCache({}); if (onAnimating) onAnimating(false); }}
-                title="Close"
+                title="Close Animation Player"
+                style={{ marginLeft: '12px' }}
               >✕</button>
             </div>
-            
-            <div style={{ marginTop: '8px' }}>
-              <BiomassGradientLegend />
-            </div>
+
           </div>
         )}
       </div>
