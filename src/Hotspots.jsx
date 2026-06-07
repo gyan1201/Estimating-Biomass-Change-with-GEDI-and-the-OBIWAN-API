@@ -17,7 +17,7 @@ const icons = {
   mixed: createIcon('🔄')
 };
 
-export const HOTSPOTS = [
+const HOTSPOTS = [
   {
     id: 1,
     name: "Mobile Delta Deforestation",
