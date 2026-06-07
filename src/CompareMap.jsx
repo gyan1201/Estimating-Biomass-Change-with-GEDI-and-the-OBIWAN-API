@@ -5,6 +5,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 import api from './api.js';
 import AnimationPlayer from './AnimationPlayer.jsx';
+import { HotspotMarkers } from './Hotspots.jsx';
 import './CompareMap.css';
 
 const ALABAMA = [32.806671, -86.791130];
@@ -182,9 +183,10 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
                   >
                     <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
                     <BiomassTile year={yearA} useCalibration={useCalibration} />
-                    
                     <SyncPrimary secondaryRef={secondaryRef} />
-                    <FlyBtn />
+                    
+                    <HotspotMarkers />
+                    
                     <DrawTool onFinish={handleFinish} drawing={drawing} />
                     {aoiPoints && (
                       <Polygon
