@@ -1,7 +1,8 @@
 // OBIWAN API Client
 // Base URL routes through Vite proxy → https://obiwan-alabama-api-5026633953.us-west1.run.app
 
-const BASE = '/api';
+const API_URL = 'https://obiwan-alabama-api-5026633953.us-west1.run.app';
+const BASE = import.meta.env.DEV ? '/api' : API_URL;
 
 async function apiFetch(path, options = {}) {
   const url = `${BASE}/${path}`;
