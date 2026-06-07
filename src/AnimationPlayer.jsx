@@ -4,6 +4,42 @@ import './AnimationPlayer.css';
 
 const YEARS = [1999, 2001, 2003, 2005, 2007, 2009, 2011, 2013, 2015, 2017, 2019, 2021, 2023];
 
+// Gradient Legend for Biomass Density
+function BiomassGradientLegend() {
+  return (
+    <div style={{
+      background: 'rgba(7, 11, 20, 0.85)',
+      backdropFilter: 'blur(8px)',
+      border: '1px solid rgba(255,255,255,0.2)',
+      padding: '8px 12px',
+      borderRadius: '8px',
+      color: 'white',
+      fontSize: '0.75rem',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+      alignItems: 'center',
+      pointerEvents: 'none',
+      width: '100%',
+      maxWidth: '240px',
+      margin: '0 auto',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+    }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Biomass Density</div>
+      <div style={{
+        width: '100%',
+        height: '10px',
+        background: 'linear-gradient(to right, #ffffe5, #d9f0a3, #78c679, #238443, #004529)',
+        borderRadius: '5px'
+      }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', opacity: 0.8 }}>
+        <span>Low</span>
+        <span>High (150+)</span>
+      </div>
+    </div>
+  );
+}
+
 function yearColor(year) {
   const idx = YEARS.indexOf(year);
   const t = idx / (YEARS.length - 1);
@@ -76,10 +112,13 @@ export default function AnimationPlayer({ useCalibration, onAnimating, children 
       {/* Player UI */}
       <div className={`anim-player mode-${mode}`}>
         {mode === 'idle' && (
-          <button className="anim-btn preload-btn" onClick={preloadTiles}>
-            <span className="anim-icon">▶</span>
-            Animate Biomass Years
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+            <BiomassGradientLegend />
+            <button className="anim-btn preload-btn" onClick={preloadTiles}>
+              <span className="anim-icon">▶</span>
+              Animate Biomass Years
+            </button>
+          </div>
         )}
 
         {mode === 'loading' && (
@@ -136,6 +175,10 @@ export default function AnimationPlayer({ useCalibration, onAnimating, children 
                 onClick={() => { setMode('idle'); setIsPlaying(false); setTileCache({}); if (onAnimating) onAnimating(false); }}
                 title="Close"
               >✕</button>
+            </div>
+            
+            <div style={{ marginTop: '8px' }}>
+              <BiomassGradientLegend />
             </div>
           </div>
         )}
