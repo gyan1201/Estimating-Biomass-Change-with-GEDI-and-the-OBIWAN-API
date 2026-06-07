@@ -13,7 +13,7 @@ function FlyToAlabama() {
   const map = useMap();
   return (
     <div
-      style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000 }}
+      style={{ position: 'absolute', top: 70, right: 12, zIndex: 1000 }}
       onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}
     >
       <button className="map-btn primary">
