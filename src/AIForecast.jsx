@@ -21,7 +21,7 @@ function calculateRegression(data) {
   return { slope, intercept };
 }
 
-export default function AIForecast({ aoi, annualData }) {
+export default function AIForecast({ aoi, annualData, onClose }) {
   const [analyzing, setAnalyzing] = useState(true);
   const [scenarioMultiplier, setScenarioMultiplier] = useState(1.0); // 1.0 = business as usual
 
@@ -95,7 +95,9 @@ export default function AIForecast({ aoi, annualData }) {
         <div className="fc-empty-state">
           <div className="fc-icon pulse">📈</div>
           <h2>Awaiting Region Data</h2>
-          <p>Please select an Area of Interest on the map to generate predictive models.</p>
+          <p>Please draw an Area of Interest on the Map Dashboard first. I need historical data to project future growth.</p>
+          <br/>
+          <button className="fc-btn" onClick={onClose}>✕ Back to Dashboard</button>
         </div>
       </div>
     );
@@ -123,9 +125,10 @@ export default function AIForecast({ aoi, annualData }) {
     <div className="forecast-wrapper">
       <div className="fc-header glass">
         <div>
-          <h2 className="fc-title">Predictive Forecast Model (2025–2035)</h2>
-          <p className="fc-subtitle">Powered by historical regression & scenario analysis</p>
+          <h2 className="fc-title">Predictive Biomass Forecast (2024–2050)</h2>
+          <p className="fc-subtitle">AI-driven projection based on local growth curves</p>
         </div>
+        <button className="fc-btn" onClick={onClose}>✕ Back to Dashboard</button>
       </div>
 
       <div className="fc-body">

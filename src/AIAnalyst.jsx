@@ -19,7 +19,7 @@ function TypingText({ text }) {
   return <span>{displayed}</span>;
 }
 
-export default function AIAnalyst({ aoi, annualData, stockData, changeData }) {
+export default function AIAnalyst({ aoi, annualData, stockData, changeData, onClose }) {
   const [analyzing, setAnalyzing] = useState(true);
 
   useEffect(() => {
@@ -37,6 +37,8 @@ export default function AIAnalyst({ aoi, annualData, stockData, changeData }) {
           <div className="ai-avatar pulse">🧠</div>
           <h2>Waiting for target coordinates...</h2>
           <p>Please draw an Area of Interest on the Map Dashboard first. I need a geographic region to run the analysis model.</p>
+          <br/>
+          <button className="ai-btn" onClick={onClose}>✕ Back to Dashboard</button>
         </div>
       </div>
     );
@@ -114,7 +116,8 @@ export default function AIAnalyst({ aoi, annualData, stockData, changeData }) {
           </div>
         </div>
         <div className="ai-actions">
-          <button className="ai-btn export">📄 Generate PDF Report</button>
+          <button className="ai-btn export" style={{marginRight: '10px'}}>📄 Generate PDF Report</button>
+          <button className="ai-btn" onClick={onClose}>✕ Back to Dashboard</button>
         </div>
       </div>
 

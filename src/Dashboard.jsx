@@ -79,7 +79,7 @@ function MetricCard({ label, value, unit, change, colorClass, icon, loading }) {
 }
 
 // ===== MAIN DASHBOARD =====
-export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
+export default function Dashboard({ activeView, setActiveView, onOpenCmd, onToggleNotif }) {
   const { unit, autoCalibrate } = useSettings();
   const displayUnit = unit === 't-ha' ? 't/ha' : 'Mg/ha';
 
@@ -339,14 +339,14 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
       {/* ── STORY MODE OVERLAY ── */}
       {storyMode && (
         <div className="story-overlay">
-          <KidGuide onClose={() => {}} /> {/* Close handled by sidebar now, or we can leave it empty */}
+          <KidGuide onClose={() => setActiveView('dashboard')} />
         </div>
       )}
 
       {/* ── GLOSSARY MODE ── */}
       {glossaryMode && (
         <div className="glossary-mode-wrapper">
-          <Glossary onClose={() => {}} />
+          <Glossary onClose={() => setActiveView('dashboard')} />
         </div>
       )}
 
@@ -356,7 +356,8 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
           aoi={aoi} 
           annualData={annualData} 
           stockData={stockData} 
-          changeData={changeData} 
+          changeData={changeData}
+          onClose={() => setActiveView('dashboard')}
         />
       )}
 
@@ -364,7 +365,8 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
       {forecastMode && (
         <AIForecast 
           aoi={aoi} 
-          annualData={annualData} 
+          annualData={annualData}
+          onClose={() => setActiveView('dashboard')}
         />
       )}
 

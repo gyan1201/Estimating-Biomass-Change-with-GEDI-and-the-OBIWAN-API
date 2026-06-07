@@ -49,6 +49,7 @@ export default function App() {
             and pass the data directly! That saves refactoring all state. */}
         <Dashboard 
           activeView={activeView} 
+          setActiveView={setActiveView}
           onOpenCmd={() => setCmdOpen(true)}
           onToggleNotif={() => setNotifOpen(n => !n)}
         />
