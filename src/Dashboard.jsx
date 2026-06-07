@@ -394,7 +394,9 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                onAoiChange={setAoi} 
                biomassUrl={biomassUrl} 
                changeMapUrl={changeMapUrl}
-               useCalibration={useCalibration} 
+               useCalibration={useCalibration}
+               onToggleHotspots={toggleChangeMap}
+               loadingHotspots={loadingChangeMap}
             />
           </div>
           {!aoi && (
@@ -527,14 +529,6 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                     <button className="run-btn" onClick={runAllAnalyses} disabled={!aoi || loadingChange}>
                       {loadingChange ? '...' : 'Analyze AOI'}
                     </button>
-                    <button 
-                      className="run-btn" 
-                      onClick={toggleChangeMap} 
-                      disabled={loadingChangeMap} 
-                      style={{ background: changeMapUrl ? 'rgba(239, 68, 68, 0.2)' : 'var(--amber)', color: changeMapUrl ? 'var(--red)' : '#000', border: changeMapUrl ? '1px solid var(--red)' : 'none' }}
-                    >
-                      {loadingChangeMap ? '...' : changeMapUrl ? '✕ Hide Hotspots' : '🔥 Show Hotspots'}
-                    </button>
                   </div>
 
                   {loadingChange ? <Loader /> : !changeData ? (
@@ -565,18 +559,6 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                         <span className="rc-unit">{changeStart} → {changeEnd}</span>
                       </div>
                     </div>
-
-                    {/* Hotspots Legend */}
-                    {changeMapUrl && (
-                       <div className="result-card" style={{ gridColumn: '1 / -1', background: 'rgba(0,0,0,0.4)', marginTop: 12 }}>
-                         <span className="rc-label">Hotspots Legend</span>
-                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '0.85rem' }}>
-                           <span style={{ color: 'var(--red)' }}>● High Biomass Loss</span>
-                           <span style={{ color: 'var(--blue)' }}>● Stable</span>
-                           <span style={{ color: 'var(--emerald)' }}>● High Biomass Gain</span>
-                         </div>
-                       </div>
-                    )}
                     </>
                   )}
                 </div>
