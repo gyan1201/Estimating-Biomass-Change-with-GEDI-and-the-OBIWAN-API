@@ -1,0 +1,52 @@
+/* KidGuide component styles */
+.kidguide-root {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  max-width: 800px;
+  width: 90%;
+  padding: 24px 28px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  color: var(--text-primary);
+  overflow-y: auto;
+  max-height: 90vh;
+}
+.kidguide-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.kidguide-close:hover { color: var(--text-primary); }
+.kidguide-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--emerald);
+}
+.kidguide-intro {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+.kidguide-illust {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.kidguide-tips {
+  list-style: disc;
+  padding-left: 1.5rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.kidguide-tips li {
+  margin-bottom: 0.6rem;
+}

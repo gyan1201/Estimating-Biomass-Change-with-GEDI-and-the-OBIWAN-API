@@ -1,0 +1,183 @@
+/* ========== VISUALS CONTAINER ========== */
+.visuals-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 20px 24px 20px 16px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.visuals-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px 24px 20px 16px;
+}
+.visuals-empty-inner {
+  text-align: center;
+}
+.ve-emoji { font-size: 4rem; margin-bottom: 12px; }
+.ve-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.ve-sub   { color: var(--text-secondary); font-size: 0.85rem; }
+
+/* ========== SHARED VIS CARD ========== */
+.vis-card {
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vis-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.vis-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ========== FOREST HEALTH CARD ========== */
+.health-card { grid-column: 1 / 2; }
+
+.health-body {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ring-gauge { flex-shrink: 0; }
+
+.gauge-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+.gauge-sub {
+  font-size: 0.75rem;
+}
+
+.health-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.health-label { font-size: 1rem; font-weight: 700; }
+.health-emoji { font-size: 1.5rem; letter-spacing: 3px; }
+.health-agbd  { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+.health-desc  { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; max-width: 200px; }
+
+/* ========== TREND CARD ========== */
+.trend-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+}
+.trend-card.gain { background: var(--emerald-dim); border: 1px solid rgba(16,185,129,0.2); }
+.trend-card.loss { background: var(--red-dim);     border: 1px solid rgba(239,68,68,0.2); }
+
+.trend-emoji  { font-size: 2rem; flex-shrink: 0; }
+.trend-title  { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+.trend-detail { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+
+/* ========== TIMELINE CARD ========== */
+.timeline-card { grid-column: 1 / 3; }
+
+.timeline-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100px;
+  padding: 0 4px;
+}
+.tl-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+.tl-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+}
+.tl-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.6s ease;
+}
+.tl-year {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+}
+
+/* ========== EXPLAINER CARD ========== */
+.explainer-card {
+  grid-column: 1 / 3;
+  border-radius: var(--radius);
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08));
+  border: 1px solid rgba(16,185,129,0.15);
+}
+.explainer-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.explainer-intro {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.explainer-comparisons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.comparison {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  text-align: center;
+}
+.cmp-emoji  { font-size: 1.8rem; }
+.cmp-text   { font-size: 0.7rem; color: var(--text-secondary); }
+.cmp-num    { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+
+/* ========== ICON BAR ========== */
+.icon-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon-bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.icon-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+.icon-bar-emoji { font-size: 1rem; }
+.icon-bar-num   { font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
