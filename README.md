@@ -1,16 +1,21 @@
-# React + Vite
+# 🌿 BioTrace AI Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![BioTrace AI](/public/icons.svg)
 
-Currently, two official plugins are available:
+**Live Deployment:** [https://estimatingbiomasschange.vercel.app/](https://estimatingbiomasschange.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+BioTrace AI is a next-generation SaaS dashboard for estimating forest biomass and tracking deforestation/reforestation over time. Built with React and Leaflet, the platform integrates with the OBIWAN API to provide high-resolution canopy data for the state of Alabama.
 
-## React Compiler
+## Features
+- **Interactive Biomass Maps:** Visualize stock and change estimates dynamically via GeoJSON polygons.
+- **AI Analyst & Assistant:** Conversational AI features to help users interpret raw forestry data.
+- **Global Command Palette:** Hit `Ctrl+K` to quickly navigate, toggle calibration settings, and trigger actions.
+- **Data Export:** Instantly download area analysis data in `.csv` or `.json` formats.
+- **AOI Bookmarks:** Save, manage, and revisit custom regions.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Local Development
+To run the dashboard locally:
+```bash
+npm install
+npm run dev
+```
