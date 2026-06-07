@@ -246,7 +246,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   };
 
   return (
-    <div className="dashboard" style={{ display: activeView === 'settings' ? 'none' : 'flex' }}>
+    <div className="dashboard">
       <Topbar 
         activeView={activeView}
         onOpenCmd={onOpenCmd}
@@ -256,6 +256,8 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
         annualData={annualData}
         stockData={stockData}
       />
+
+      <div className="dashboard-content" style={{ display: activeView === 'settings' ? 'none' : 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
 
       <AIChat 
         aoi={aoi}
@@ -680,6 +682,8 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
         <span>ObiWan.AI — Powered by NASA GEDI L4B &amp; OBIWAN API</span>
         <span>Data: <a href="https://gedi.umd.edu" target="_blank" rel="noopener noreferrer">gedi.umd.edu</a></span>
       </footer>
+
+      </div>
     </div>
   );
 }
