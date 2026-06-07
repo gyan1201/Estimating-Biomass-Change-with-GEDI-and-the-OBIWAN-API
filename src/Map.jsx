@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Polygon, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import AnimationPlayer from './AnimationPlayer.jsx';
@@ -40,7 +40,6 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
     },
     contextmenu(e) {
       if (!drawing || points.length < 3) return;
-      // Right-click to finish polygon
       const coords = [...points.map(p => [p[1], p[0]]), [points[0][1], points[0][0]]];
       const featureCollection = {
         type: 'FeatureCollection',
@@ -62,10 +61,48 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
   );
 }
 
+// ── SYNC LOGIC (Lifted from CompareMap) ──
+function SyncSecondary({ primaryRef }) {
+  const map = useMap();
+  useEffect(() => {
+    const primary = primaryRef.current;
+    if (!primary) return;
+    map.setView(primary.getCenter(), primary.getZoom(), { animate: false });
+  }, []);
+  return null;
+}
+
+function SyncPrimary({ secondaryRef }) {
+  const map = useMap();
+  useMapEvents({
+    move() {
+      const sec = secondaryRef.current;
+      if (!sec) return;
+      sec.setView(map.getCenter(), map.getZoom(), { animate: false });
+    },
+  });
+  return null;
+}
+
+function SyncBack({ primaryRef }) {
+  const map = useMap();
+  useMapEvents({
+    move() {
+      const pri = primaryRef.current;
+      if (!pri) return;
+      pri.setView(map.getCenter(), map.getZoom(), { animate: false });
+    },
+  });
+  return null;
+}
+
+
 export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
   const [drawing, setDrawing] = useState(false);
   const [finishedPoints, setFinishedPoints] = useState(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  
+  const primaryRef = useRef(null);
+  const secondaryRef = useRef(null);
 
   const handleFinish = useCallback((featureCollection, pts) => {
     setFinishedPoints(pts);
@@ -79,49 +116,89 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
   };
 
   return (
-    <div className="map-wrapper">
-      {/* Controls */}
-      <div className="map-controls">
-        {!drawing && !finishedPoints && (
-          <button className="map-btn primary" onClick={() => setDrawing(true)}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            Draw AOI
-          </button>
-        )}
-        {drawing && (
-          <span className="map-hint">
-            Left-click to add points · Right-click to finish ({'>'}2 points needed)
-          </span>
-        )}
-        {finishedPoints && (
-          <button className="map-btn danger" onClick={clearAoi}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Clear Selection
-          </button>
-        )}
-      </div>
+    <div className="map-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
+      <AnimationPlayer useCalibration={useCalibration} onAnimating={() => {}}>
+        {({ mode, currentUrl, tileCache, currentYear, validYears }) => {
+          
+          const isSplitView = mode === 'ready' || mode === 'loading';
 
-      <MapContainer
-        center={[20, 0]}
-        zoom={2}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={false}
-      >
-        <TileLayer
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          attribution="Esri World Imagery"
-        />
-        <FlyToAlabama />
-        <BiomassTileLayer url={biomassUrl} hidden={isAnimating} />
-        <DrawTool onFinish={handleFinish} drawing={drawing} setDrawing={setDrawing} />
-        {finishedPoints && (
-          <Polygon
-            positions={finishedPoints}
-            pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }}
-          />
-        )}
-        <AnimationPlayer useCalibration={useCalibration} onAnimating={setIsAnimating} />
-      </MapContainer>
+          return (
+            <div style={{ flex: 1, position: 'relative', display: 'flex', overflow: 'hidden' }}>
+              
+              {/* Controls Overlay (Only visible in normal mode or when drawing) */}
+              {!isSplitView && (
+                <div className="map-controls" style={{ position: 'absolute', zIndex: 1000, top: 12, left: 12 }}>
+                  {!drawing && !finishedPoints && (
+                    <button className="map-btn primary" onClick={() => setDrawing(true)}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      Draw AOI
+                    </button>
+                  )}
+                  {drawing && (
+                    <span className="map-hint">
+                      Left-click to add points · Right-click to finish ({'>'}2 points needed)
+                    </span>
+                  )}
+                  {finishedPoints && (
+                    <button className="map-btn danger" onClick={clearAoi}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      Clear Selection
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* ── SPLIT VIEW ── */}
+              {isSplitView ? (
+                <div className="compare-maps" style={{ width: '100%', height: '100%', display: 'flex' }}>
+                  {/* Left Map: Bare Satellite */}
+                  <div className="map-half left-half" style={{ flex: 1, position: 'relative' }}>
+                    <div className="map-badge left-badge" style={{ position: 'absolute', zIndex: 1000, top: 10, left: 10, background: 'rgba(0,0,0,0.7)', color: 'white', padding: '4px 8px', borderRadius: 4, fontSize: '12px', fontWeight: 'bold' }}>
+                      🛰️ Present Satellite View
+                    </div>
+                    <MapContainer center={ALABAMA} zoom={6} zoomControl={true} style={{ width: '100%', height: '100%' }} ref={primaryRef}>
+                      <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                      <SyncPrimary secondaryRef={secondaryRef} />
+                      <FlyToAlabama />
+                      {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
+                    </MapContainer>
+                  </div>
+
+                  <div className="compare-divider" style={{ width: '4px', background: '#334155', zIndex: 1000 }}></div>
+
+                  {/* Right Map: Satellite + Animated Biomass */}
+                  <div className="map-half right-half" style={{ flex: 1, position: 'relative' }}>
+                    <div className="map-badge right-badge" style={{ position: 'absolute', zIndex: 1000, top: 10, right: 10, background: 'rgba(16, 185, 129, 0.9)', color: 'white', padding: '4px 8px', borderRadius: 4, fontSize: '12px', fontWeight: 'bold' }}>
+                      🌳 Biomass Animation
+                    </div>
+                    <MapContainer center={ALABAMA} zoom={6} zoomControl={false} style={{ width: '100%', height: '100%' }} ref={secondaryRef}>
+                      <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                      
+                      {/* PRE-RENDER ALL TILES CONCURRENTLY AT 0 OPACITY TO FORCE BROWSER CACHING! */}
+                      {mode === 'ready' && validYears.map(y => (
+                        <TileLayer key={y} url={tileCache[y]} opacity={y === currentYear ? 0.65 : 0} zIndex={10} />
+                      ))}
+
+                      <SyncSecondary primaryRef={primaryRef} />
+                      <SyncBack primaryRef={primaryRef} />
+                      {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
+                    </MapContainer>
+                  </div>
+                </div>
+              ) : (
+                /* ── NORMAL SINGLE MAP ── */
+                <MapContainer center={ALABAMA} zoom={6} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+                  <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                  <FlyToAlabama />
+                  <BiomassTileLayer url={biomassUrl} hidden={false} />
+                  <DrawTool onFinish={handleFinish} drawing={drawing} setDrawing={setDrawing} />
+                  {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
+                </MapContainer>
+              )}
+            </div>
+          );
+        }}
+      </AnimationPlayer>
     </div>
   );
 }
