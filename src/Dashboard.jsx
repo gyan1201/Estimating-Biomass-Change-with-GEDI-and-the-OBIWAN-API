@@ -110,6 +110,8 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   const [changeEnd, setChangeEnd] = useState(2021);
   const [changeData, setChangeData] = useState(null);
   const [loadingChange, setLoadingChange] = useState(false);
+  const [changeMapUrl, setChangeMapUrl] = useState(null);
+  const [loadingChangeMap, setLoadingChangeMap] = useState(false);
 
   // Additionality
   const [addBaseStart, setAddBaseStart] = useState(2010);
@@ -189,6 +191,22 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
       .then(d => setAdditionalityData(d))
       .catch(e => setError(humanError(e)))
       .finally(() => setLoadingAdd(false));
+  };
+
+  const toggleChangeMap = async () => {
+    if (changeMapUrl) {
+      setChangeMapUrl(null);
+      return;
+    }
+    setLoadingChangeMap(true);
+    try {
+      const data = await api.getChangeMap(changeStart, changeEnd, useCalibration);
+      if (data?.url) setChangeMapUrl(data.url);
+    } catch (e) {
+      setError(humanError(e));
+    } finally {
+      setLoadingChangeMap(false);
+    }
   };
 
   const annualRate = annualData.length >= 2
@@ -372,7 +390,12 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
             {loadingMap && <span className="mini-loader pulse">Loading tile...</span>}
           </div>
           <div className="map-container">
-            <Map onAoiChange={setAoi} biomassUrl={biomassUrl} useCalibration={useCalibration} />
+            <Map 
+               onAoiChange={setAoi} 
+               biomassUrl={biomassUrl} 
+               changeMapUrl={changeMapUrl}
+               useCalibration={useCalibration} 
+            />
           </div>
           {!aoi && (
             <div className="map-cta">
@@ -502,14 +525,23 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                       </select>
                     </div>
                     <button className="run-btn" onClick={runAllAnalyses} disabled={!aoi || loadingChange}>
-                      {loadingChange ? '...' : 'Analyze'}
+                      {loadingChange ? '...' : 'Analyze AOI'}
+                    </button>
+                    <button 
+                      className="run-btn" 
+                      onClick={toggleChangeMap} 
+                      disabled={loadingChangeMap} 
+                      style={{ background: changeMapUrl ? 'rgba(239, 68, 68, 0.2)' : 'var(--amber)', color: changeMapUrl ? 'var(--red)' : '#000', border: changeMapUrl ? '1px solid var(--red)' : 'none' }}
+                    >
+                      {loadingChangeMap ? '...' : changeMapUrl ? '✕ Hide Hotspots' : '🔥 Show Hotspots'}
                     </button>
                   </div>
 
                   {loadingChange ? <Loader /> : !changeData ? (
                     <EmptyState icon="📈" text="Draw an AOI on the map, then press Analyze" />
                   ) : (
-                    <div className="result-cards">
+                    <>
+                      <div className="result-cards">
                       <div className="result-card emerald">
                         <span className="rc-label">Δ AGBD</span>
                         <span className="rc-value">{fmtSigned(changeData.dAGBD, 3)}</span>
@@ -533,6 +565,19 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                         <span className="rc-unit">{changeStart} → {changeEnd}</span>
                       </div>
                     </div>
+
+                    {/* Hotspots Legend */}
+                    {changeMapUrl && (
+                       <div className="result-card" style={{ gridColumn: '1 / -1', background: 'rgba(0,0,0,0.4)', marginTop: 12 }}>
+                         <span className="rc-label">Hotspots Legend</span>
+                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '0.85rem' }}>
+                           <span style={{ color: 'var(--red)' }}>● High Biomass Loss</span>
+                           <span style={{ color: 'var(--blue)' }}>● Stable</span>
+                           <span style={{ color: 'var(--emerald)' }}>● High Biomass Gain</span>
+                         </div>
+                       </div>
+                    )}
+                    </>
                   )}
                 </div>
               )}

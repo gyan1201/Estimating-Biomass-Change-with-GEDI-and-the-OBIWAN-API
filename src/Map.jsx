@@ -97,7 +97,7 @@ function SyncBack({ primaryRef }) {
 }
 
 
-export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
+export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibration }) {
   const [drawing, setDrawing] = useState(false);
   const [finishedPoints, setFinishedPoints] = useState(null);
   
@@ -191,6 +191,7 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
                   <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
                   <FlyToAlabama />
                   <BiomassTileLayer url={biomassUrl} hidden={false} />
+                  {changeMapUrl && <TileLayer url={changeMapUrl} opacity={0.7} zIndex={6} />}
                   <DrawTool onFinish={handleFinish} drawing={drawing} setDrawing={setDrawing} />
                   {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
                 </MapContainer>
