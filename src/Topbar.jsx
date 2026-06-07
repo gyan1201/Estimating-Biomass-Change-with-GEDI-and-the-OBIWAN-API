@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from './SettingsContext.jsx';
 import './Topbar.css';
 
 export default function Topbar({ activeView, toggleNotifications, onOpenCmd, hasUnreadNotifications, aoi, annualData, stockData }) {
+  const { unit } = useSettings();
+  const displayUnit = unit === 't-ha' ? 't/ha' : 'Mg/ha';
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -50,12 +53,12 @@ export default function Topbar({ activeView, toggleNotifications, onOpenCmd, has
       <div className="topbar-center">
         <div className="live-stat">
           <span className="stat-label">Current AGBD</span>
-          <span className="stat-value">{currentAGBD} <small>Mg/ha</small></span>
+          <span className="stat-value">{currentAGBD} <small>{displayUnit}</small></span>
         </div>
         <div className="live-stat">
           <span className="stat-label">Net Change</span>
           <span className={`stat-value ${changeIsPositive === true ? 'positive' : changeIsPositive === false ? 'negative' : ''}`}>
-            {netChange} <small>Mg/ha</small> ({netChangePct}%)
+            {netChange} <small>{displayUnit}</small> ({netChangePct}%)
           </span>
         </div>
         <div className="live-stat">

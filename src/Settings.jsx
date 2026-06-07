@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSettings } from './SettingsContext.jsx';
 import './Settings.css';
 
 export default function Settings() {
-  const [theme, setTheme] = useState('midnight');
-  const [unit, setUnit] = useState('mg-ha');
-  const [autoCalibrate, setAutoCalibrate] = useState(false);
+  const { theme, setTheme, unit, setUnit, autoCalibrate, setAutoCalibrate, aiAlerts, setAiAlerts, apiHealth, setApiHealth } = useSettings();
 
-  // In a real app, changing theme would update CSS variables on document.documentElement
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    // document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   return (
@@ -77,7 +74,7 @@ export default function Settings() {
               <p>Receive push notifications when AI detects significant biomass drops.</p>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" checked={aiAlerts} onChange={(e) => setAiAlerts(e.target.checked)} />
               <span className="slider"></span>
             </label>
           </div>
@@ -88,14 +85,14 @@ export default function Settings() {
               <p>Alerts when OBIWAN endpoints experience latency or downtime.</p>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" checked={apiHealth} onChange={(e) => setApiHealth(e.target.checked)} />
               <span className="slider"></span>
             </label>
           </div>
         </div>
 
         <div className="settings-actions">
-          <button className="save-btn">Save Preferences</button>
+          <button className="save-btn" onClick={() => alert('Preferences saved globally!')}>Save Preferences</button>
         </div>
       </div>
     </div>

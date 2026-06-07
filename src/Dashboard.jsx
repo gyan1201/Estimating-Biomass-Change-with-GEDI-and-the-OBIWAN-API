@@ -8,6 +8,7 @@ import Map from './Map.jsx';
 import api from './api.js';
 import Visuals from './Visuals.jsx';
 import CompareMap from './CompareMap.jsx';
+import { useSettings } from './SettingsContext.jsx';
 import KidGuide from './KidGuide.jsx';
 import Glossary from './Glossary.jsx';
 import AIAnalyst from './AIAnalyst.jsx';
@@ -50,6 +51,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 // ===== METRIC CARD =====
 function MetricCard({ label, value, unit, change, colorClass, icon, loading }) {
+  const { unit: displayUnit } = useSettings();
   return (
     <motion.div
       className={`metric-card glass ${colorClass}`}
@@ -67,7 +69,7 @@ function MetricCard({ label, value, unit, change, colorClass, icon, loading }) {
         )}
         {change !== undefined && !loading && (
           <span className={`mc-change ${change >= 0 ? 'positive' : 'negative'}`}>
-            {change >= 0 ? '▲' : '▼'} {fmt(Math.abs(change))} Mg/ha/yr
+            {change >= 0 ? '▲' : '▼'} {fmt(Math.abs(change))} {displayUnit}/yr
           </span>
         )}
       </div>
@@ -77,8 +79,11 @@ function MetricCard({ label, value, unit, change, colorClass, icon, loading }) {
 
 // ===== MAIN DASHBOARD =====
 export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
+  const { unit, autoCalibrate } = useSettings();
+  const displayUnit = unit === 't-ha' ? 't/ha' : 'Mg/ha';
+
   const [aoi, setAoi] = useState(null);
-  const [useCalibration, setUseCalibration] = useState(false);
+  const [useCalibration, setUseCalibration] = useState(autoCalibrate);
   const [activeTab, setActiveTab]     = useState('annual');
 
   // Derive mode flags from the activeView prop
@@ -395,7 +400,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
             <MetricCard
               label="Current AGBD"
               value={fmt(latestAGBD)}
-              unit="Mg/ha"
+              unit={displayUnit}
               colorClass="emerald"
               loading={loadingAnnual && !latestAGBD}
               icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22V12m0 0a5 5 0 0 0 5-5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 0 5 5z"/></svg>}
@@ -403,7 +408,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
             <MetricCard
               label="Annual Change Rate"
               value={fmtSigned(annualRate)}
-              unit="Mg/ha/yr"
+              unit={`${displayUnit}/yr`}
               colorClass="blue"
               loading={loadingAnnual && !annualData.length}
               icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>}
@@ -411,7 +416,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
             <MetricCard
               label="Net Change (dAGBD)"
               value={changeData ? fmtSigned(changeData.dAGBD) : '—'}
-              unit={`Mg/ha (${changeStart}→${changeEnd})`}
+              unit={`${displayUnit} (${changeStart}→${changeEnd})`}
               colorClass="purple"
               loading={loadingChange}
               icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>}
@@ -474,7 +479,7 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                           <XAxis dataKey="year" stroke="#4B5470" tick={{ fill: '#8B95B0', fontSize: 12 }} />
-                          <YAxis stroke="#4B5470" tick={{ fill: '#8B95B0', fontSize: 12 }} label={{ value: 'Mg/ha', angle: -90, position: 'insideLeft', fill: '#4B5470', fontSize: 11 }} />
+                          <YAxis stroke="#4B5470" tick={{ fill: '#8B95B0', fontSize: 12 }} label={{ value: displayUnit, angle: -90, position: 'insideLeft', fill: '#4B5470', fontSize: 11 }} />
                           <Tooltip content={<CustomTooltip />} />
                           <Legend wrapperStyle={{ color: '#8B95B0', fontSize: 12 }} />
                           <Area type="monotone" dataKey="AGBD" name={useCalibration ? 'Calibrated AGBD' : 'AGBD'} stroke="#10B981" fill="url(#agbdGrad)" strokeWidth={2.5} dot={{ r: 4, fill: '#10B981', strokeWidth: 0 }} activeDot={{ r: 6 }} />
@@ -521,12 +526,12 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                       <div className="result-card emerald">
                         <span className="rc-label">Δ AGBD</span>
                         <span className="rc-value">{fmtSigned(changeData.dAGBD, 3)}</span>
-                        <span className="rc-unit">Mg/ha</span>
+                        <span className="rc-unit">{displayUnit}</span>
                       </div>
                       <div className="result-card blue">
                         <span className="rc-label">Std AGBD</span>
                         <span className="rc-value">±{fmt(changeData.stddAGBD, 3)}</span>
-                        <span className="rc-unit">Mg/ha</span>
+                        <span className="rc-unit">{displayUnit}</span>
                       </div>
                       <div className="result-card purple">
                         <span className="rc-label">Area</span>
@@ -641,12 +646,12 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
                       <div className="result-card emerald">
                         <span className="rc-label">AGBD (Mean)</span>
                         <span className="rc-value">{fmt(stockData.AGBD, 3)}</span>
-                        <span className="rc-unit">Mg/ha</span>
+                        <span className="rc-unit">{displayUnit}</span>
                       </div>
                       <div className="result-card blue">
                         <span className="rc-label">Std AGBD</span>
                         <span className="rc-value">±{fmt(stockData.stdAGBD, 3)}</span>
-                        <span className="rc-unit">Mg/ha</span>
+                        <span className="rc-unit">{displayUnit}</span>
                       </div>
                       <div className="result-card purple">
                         <span className="rc-label">Area</span>

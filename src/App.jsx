@@ -6,6 +6,7 @@ import CommandPalette from './CommandPalette.jsx';
 import NotificationCenter from './NotificationCenter.jsx';
 import AIChat from './AIChat.jsx';
 import Settings from './Settings.jsx';
+import { SettingsProvider } from './SettingsContext.jsx';
 import './App.css';
 
 export default function App() {
@@ -34,8 +35,9 @@ export default function App() {
   // lift the data state to App.jsx.
   // Let's lift the data state to App.jsx so it's globally available.
   return (
-    <div className="app-layout">
-      <div className="bg-mesh" />
+    <SettingsProvider>
+      <div className="app-layout">
+        <div className="bg-mesh" />
       <Sidebar activeView={activeView} setActiveView={setActiveView} />
       
       <main className="app-main">
@@ -55,5 +57,6 @@ export default function App() {
         {activeView === 'settings' && <Settings />}
       </main>
     </div>
+    </SettingsProvider>
   );
 }
