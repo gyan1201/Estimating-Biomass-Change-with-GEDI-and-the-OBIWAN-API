@@ -1,12 +1,24 @@
 /* ========== ANIMATION PLAYER ========== */
 .anim-player {
+  z-index: 1000;
+  pointer-events: all;
+  transition: all 0.3s ease;
+}
+
+.anim-player.mode-idle, .anim-player.mode-loading {
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
   width: min(520px, calc(100% - 24px));
-  pointer-events: all;
+}
+
+.anim-player.mode-ready {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+  background: rgba(7, 11, 20, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ── Preload button ── */
@@ -74,6 +86,15 @@
   flex-direction: column;
   gap: 10px;
   box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+.anim-player.mode-ready .anim-controls {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 /* Year badge */

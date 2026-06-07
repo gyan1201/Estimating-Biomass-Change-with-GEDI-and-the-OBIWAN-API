@@ -74,7 +74,7 @@ export default function AnimationPlayer({ useCalibration, onAnimating, children 
       {children({ mode, currentUrl, tileCache, currentYear, validYears })}
 
       {/* Player UI */}
-      <div className="anim-player" style={{ position: mode === 'idle' ? 'absolute' : 'relative', bottom: mode === 'idle' ? 20 : 0, left: mode === 'idle' ? 20 : 0, right: mode === 'idle' ? 'auto' : 0, width: mode === 'idle' ? 'auto' : '100%', zIndex: 1000 }}>
+      <div className={`anim-player mode-${mode}`}>
         {mode === 'idle' && (
           <button className="anim-btn preload-btn" onClick={preloadTiles}>
             <span className="anim-icon">▶</span>
