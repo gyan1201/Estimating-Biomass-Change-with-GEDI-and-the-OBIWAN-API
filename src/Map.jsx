@@ -61,6 +61,41 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
   );
 }
 
+// Gradient Legend for Biomass Density
+function BiomassGradientLegend() {
+  return (
+    <div style={{
+      position: 'absolute',
+      bottom: 25,
+      right: 10,
+      zIndex: 1000,
+      background: 'rgba(7, 11, 20, 0.85)',
+      backdropFilter: 'blur(8px)',
+      border: '1px solid rgba(255,255,255,0.2)',
+      padding: '8px 12px',
+      borderRadius: '8px',
+      color: 'white',
+      fontSize: '0.75rem',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+      pointerEvents: 'none'
+    }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '2px', textAlign: 'center' }}>Biomass Density</div>
+      <div style={{
+        width: '120px',
+        height: '10px',
+        background: 'linear-gradient(to right, #ffffe5, #d9f0a3, #78c679, #238443, #004529)',
+        borderRadius: '5px'
+      }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.8 }}>
+        <span>Low</span>
+        <span>High</span>
+      </div>
+    </div>
+  );
+}
+
 // ── SYNC LOGIC (Lifted from CompareMap) ──
 function SyncSecondary({ primaryRef }) {
   const map = useMap();
@@ -183,6 +218,7 @@ export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibrat
                       <SyncBack primaryRef={primaryRef} />
                       {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
                     </MapContainer>
+                    <BiomassGradientLegend />
                   </div>
                 </div>
               ) : (
@@ -191,6 +227,7 @@ export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibrat
                   <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
                   <FlyToAlabama />
                   <BiomassTileLayer url={biomassUrl} hidden={false} />
+                  {biomassUrl && !changeMapUrl && <BiomassGradientLegend />}
                   {changeMapUrl && <TileLayer url={changeMapUrl} opacity={0.7} zIndex={6} />}
                   <DrawTool onFinish={handleFinish} drawing={drawing} setDrawing={setDrawing} />
                   {finishedPoints && <Polygon positions={finishedPoints} pathOptions={{ color: '#10B981', fillColor: '#10B981', fillOpacity: 0.2, weight: 2 }} />}
