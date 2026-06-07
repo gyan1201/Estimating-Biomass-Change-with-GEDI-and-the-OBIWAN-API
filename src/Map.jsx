@@ -49,10 +49,14 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
   );
 }
 
-function BottomLeftControls({ drawing, setDrawing, finishedPoints, clearAoi }) {
+function MapTopControls({ drawing, setDrawing, finishedPoints, clearAoi }) {
   const map = useMap();
   return (
-    <div className="map-controls" style={{ position: 'absolute', bottom: 30, left: 12, top: 'auto', zIndex: 1000, display: 'flex', gap: '8px', alignItems: 'center' }}>
+    <div className="map-controls" style={{ position: 'absolute', top: 12, left: 50, zIndex: 1000, display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <button className="map-btn primary" onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}>
+        ✈ Fly to Alabama
+      </button>
+
       {!drawing && !finishedPoints && (
         <button className="map-btn primary" onClick={() => setDrawing(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
@@ -70,17 +74,6 @@ function BottomLeftControls({ drawing, setDrawing, finishedPoints, clearAoi }) {
           Clear Selection
         </button>
       )}
-    </div>
-  );
-}
-
-function BottomRightControls() {
-  const map = useMap();
-  return (
-    <div className="map-controls" style={{ position: 'absolute', bottom: 30, right: 12, top: 'auto', left: 'auto', zIndex: 1000 }}>
-      <button className="map-btn primary" onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}>
-        ✈ Fly to Alabama
-      </button>
     </div>
   );
 }
@@ -155,13 +148,12 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
           </LayersControl.Overlay>
         </LayersControl>
 
-        <BottomLeftControls 
+        <MapTopControls 
           drawing={drawing} 
           setDrawing={setDrawing} 
           finishedPoints={finishedPoints} 
           clearAoi={clearAoi} 
         />
-        <BottomRightControls />
         <BiomassTileLayer url={biomassUrl} hidden={false} />
         
         {!drawing && <HotspotMarkers onSelect={selectHotspot} />}
