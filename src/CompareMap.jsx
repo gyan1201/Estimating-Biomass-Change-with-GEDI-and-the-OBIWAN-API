@@ -111,6 +111,27 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
   const [aoiPoints, setAoiPoints] = useState(null);
   const [yearA, setYearA]         = useState(1999);
   const [yearB, setYearB]         = useState(2023);
+  
+  const [changeMapUrl, setChangeMapUrl] = useState(null);
+  const [loadingHotspots, setLoadingHotspots] = useState(false);
+  const [error, setError] = useState(null);
+
+  const toggleChangeMap = async () => {
+    if (changeMapUrl) {
+      setChangeMapUrl(null);
+      return;
+    }
+    setLoadingHotspots(true);
+    try {
+      const data = await api.getChangeMap(1999, 2023, useCalibration);
+      if (data?.url) setChangeMapUrl(data.url);
+    } catch (e) {
+      setError("Failed to load Change Map");
+      console.error(e);
+    } finally {
+      setLoadingHotspots(false);
+    }
+  };
 
   const handleFinish = useCallback((fc, pts) => {
     setAoiPoints(pts);
@@ -165,8 +186,36 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
                   {aoiPoints && (
                     <button className="compare-clear-btn" onClick={clearAoi}>✕ Clear AOI</button>
                   )}
+
+                  {/* Hotspots Toggle */}
+                  <button 
+                    className="map-btn" 
+                    onClick={toggleChangeMap}
+                    disabled={loadingHotspots}
+                    style={{ 
+                      background: changeMapUrl ? 'rgba(239, 68, 68, 0.9)' : '#fff', 
+                      color: changeMapUrl ? '#fff' : '#000', 
+                      border: changeMapUrl ? 'none' : '1px solid #ccc',
+                      marginLeft: '8px'
+                    }}
+                  >
+                    {loadingHotspots ? 'Loading...' : changeMapUrl ? '✕ Hide Hotspots' : '🔥 Show Hotspots'}
+                  </button>
                 </div>
               </div>
+
+              {changeMapUrl && (
+                <div style={{ 
+                  position: 'absolute', top: '80px', left: '20px', zIndex: 1000,
+                  background: 'rgba(0,0,0,0.8)', padding: '8px 12px', borderRadius: '6px', 
+                  fontSize: '12px', color: 'white', display: 'flex', flexDirection: 'column', gap: '4px'
+                }}>
+                  <div style={{ fontWeight: 'bold', borderBottom: '1px solid #555', paddingBottom: '4px', marginBottom: '2px' }}>Hotspots Legend</div>
+                  <div><span style={{ color: '#EF4444' }}>●</span> High Loss</div>
+                  <div><span style={{ color: '#3B82F6' }}>●</span> Stable</div>
+                  <div><span style={{ color: '#10B981' }}>●</span> High Gain</div>
+                </div>
+              )}
 
               {/* ── Two Maps Side by Side ── */}
               <div className="compare-maps" style={{ flex: 1, display: 'flex', position: 'relative' }}>
@@ -220,6 +269,7 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
                       </LayersControl.Overlay>
                     </LayersControl>
                     <BiomassTile year={yearA} useCalibration={useCalibration} />
+                    {changeMapUrl && <TileLayer url={changeMapUrl} opacity={0.7} zIndex={6} />}
                     <SyncPrimary secondaryRef={secondaryRef} />
                     
                     <HotspotMarkers />

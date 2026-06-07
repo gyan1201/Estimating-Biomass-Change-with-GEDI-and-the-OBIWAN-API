@@ -110,8 +110,6 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   const [changeEnd, setChangeEnd] = useState(2021);
   const [changeData, setChangeData] = useState(null);
   const [loadingChange, setLoadingChange] = useState(false);
-  const [changeMapUrl, setChangeMapUrl] = useState(null);
-  const [loadingChangeMap, setLoadingChangeMap] = useState(false);
 
   // Additionality
   const [addBaseStart, setAddBaseStart] = useState(2010);
@@ -191,22 +189,6 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
       .then(d => setAdditionalityData(d))
       .catch(e => setError(humanError(e)))
       .finally(() => setLoadingAdd(false));
-  };
-
-  const toggleChangeMap = async () => {
-    if (changeMapUrl) {
-      setChangeMapUrl(null);
-      return;
-    }
-    setLoadingChangeMap(true);
-    try {
-      const data = await api.getChangeMap(changeStart, changeEnd, useCalibration);
-      if (data?.url) setChangeMapUrl(data.url);
-    } catch (e) {
-      setError(humanError(e));
-    } finally {
-      setLoadingChangeMap(false);
-    }
   };
 
   const annualRate = annualData.length >= 2
@@ -391,12 +373,9 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
           </div>
           <div className="map-container">
             <Map 
-               onAoiChange={setAoi} 
-               biomassUrl={biomassUrl} 
-               changeMapUrl={changeMapUrl}
-               useCalibration={useCalibration}
-               onToggleHotspots={toggleChangeMap}
-               loadingHotspots={loadingChangeMap}
+              biomassUrl={biomassUrl}
+              onAoiChange={setAoi}
+              useCalibration={useCalibration}
             />
           </div>
           {!aoi && (

@@ -62,7 +62,7 @@ function DrawTool({ onFinish, drawing, setDrawing }) {
   );
 }
 
-export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibration, onToggleHotspots, loadingHotspots }) {
+export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
   const [drawing, setDrawing] = useState(false);
   const [finishedPoints, setFinishedPoints] = useState(null);
 
@@ -107,41 +107,7 @@ export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibrat
             Clear Selection
           </button>
         )}
-        {/* Hotspots Map Toggle */}
-        {onToggleHotspots && (
-          <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <button 
-              className="map-btn" 
-              onClick={onToggleHotspots}
-              disabled={loadingHotspots}
-              style={{ 
-                background: changeMapUrl ? 'rgba(239, 68, 68, 0.9)' : '#fff', 
-                color: changeMapUrl ? '#fff' : '#000', 
-                border: changeMapUrl ? 'none' : '1px solid #ccc' 
-              }}
-            >
-              {loadingHotspots ? 'Loading...' : changeMapUrl ? '✕ Hide Hotspots' : '🔥 Show Hotspots'}
-            </button>
-            
-            {changeMapUrl && (
-              <div style={{ 
-                background: 'rgba(0,0,0,0.8)', 
-                padding: '6px 8px', 
-                borderRadius: '4px', 
-                fontSize: '11px', 
-                color: 'white',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '2px'
-              }}>
-                <div style={{ fontWeight: 'bold', borderBottom: '1px solid #555', paddingBottom: '2px', marginBottom: '2px' }}>Hotspots Legend</div>
-                <div><span style={{ color: '#EF4444' }}>●</span> High Loss</div>
-                <div><span style={{ color: '#3B82F6' }}>●</span> Stable</div>
-                <div><span style={{ color: '#10B981' }}>●</span> High Gain</div>
-              </div>
-            )}
-          </div>
-        )}
+
       </div>
 
       <MapContainer center={ALABAMA} zoom={7} zoomControl={true} style={{ height: '100%', width: '100%' }}>
@@ -188,7 +154,6 @@ export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibrat
 
         <FlyToAlabama />
         <BiomassTileLayer url={biomassUrl} hidden={false} />
-        {changeMapUrl && <TileLayer url={changeMapUrl} opacity={0.7} zIndex={6} />}
         
         {!drawing && <HotspotMarkers onSelect={selectHotspot} />}
 
