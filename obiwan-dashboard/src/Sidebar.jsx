@@ -9,6 +9,7 @@ export default function Sidebar({ activeView, setActiveView, workspaceName = "Ed
     { id: 'compare', icon: '🗺️', label: 'Compare Maps' },
     { id: 'story', icon: '📖', label: 'Story Mode' },
     { id: 'glossary', icon: '📚', label: 'Glossary' },
+    { id: 'settings', icon: '⚙️', label: 'Settings' },
   ];
 
   return (

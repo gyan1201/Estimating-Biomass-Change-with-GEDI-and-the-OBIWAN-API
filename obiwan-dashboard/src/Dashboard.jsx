@@ -12,6 +12,8 @@ import KidGuide from './KidGuide.jsx';
 import Glossary from './Glossary.jsx';
 import AIAnalyst from './AIAnalyst.jsx';
 import AIForecast from './AIForecast.jsx';
+import Topbar from './Topbar.jsx';
+import AIChat from './AIChat.jsx';
 import './Dashboard.css';
 
 // ===== HELPERS =====
@@ -74,7 +76,7 @@ function MetricCard({ label, value, unit, change, colorClass, icon, loading }) {
 }
 
 // ===== MAIN DASHBOARD =====
-export default function Dashboard({ activeView }) {
+export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
   const [aoi, setAoi] = useState(null);
   const [useCalibration, setUseCalibration] = useState(false);
   const [activeTab, setActiveTab]     = useState('annual');
@@ -86,6 +88,18 @@ export default function Dashboard({ activeView }) {
   const aiAnalystMode = activeView === 'ai-analyst';
   const forecastMode = activeView === 'forecast';
   const isDashboard = activeView === 'dashboard';
+
+  // Command Palette Listener
+  useEffect(() => {
+    const handleCmdAction = (e) => {
+      const action = e.detail;
+      if (action === 'toggle-cal') setUseCalibration(c => !c);
+      else if (action === 'export-csv') handleExportCSV();
+      else if (action === 'export-json') handleExportJSON();
+    };
+    document.addEventListener('cmd-action', handleCmdAction);
+    return () => document.removeEventListener('cmd-action', handleCmdAction);
+  }, [annualData, stockData]);
 
   // Biomass map overlay
   const [biomassYear, setBiomassYear] = useState(2021);
@@ -183,27 +197,72 @@ export default function Dashboard({ activeView }) {
 
   const YEARS = Array.from({ length: 13 }, (_, i) => 1999 + i * 2);
 
-  return (
-    <div className="dashboard">
-      {/* ── TOP BAR ── */}
-      <header className="topbar glass">
-        <div className="topbar-brand">
-          <svg className="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#10B981" strokeWidth="1.5"/>
-            <circle cx="12" cy="12" r="4" fill="#10B981" opacity="0.3"/>
-            <circle cx="12" cy="12" r="1.5" fill="#10B981"/>
-            <line x1="12" y1="2" x2="12" y2="6" stroke="#10B981" strokeWidth="1.5"/>
-            <line x1="12" y1="18" x2="12" y2="22" stroke="#10B981" strokeWidth="1.5"/>
-            <line x1="2" y1="12" x2="6" y2="12" stroke="#10B981" strokeWidth="1.5"/>
-            <line x1="18" y1="12" x2="22" y2="12" stroke="#10B981" strokeWidth="1.5"/>
-          </svg>
-          <div>
-            <h1>ObiWan<span className="brand-accent">.AI</span></h1>
-            <p>Forest Carbon Intelligence Platform</p>
-          </div>
-        </div>
+  // --- Feature 6: Data Export ---
+  const handleExportCSV = () => {
+    if (!annualData || annualData.length === 0) return;
+    const headers = "Year,AGBD (Mg/ha),Std_AGBD\n";
+    const rows = annualData.map(d => `${d.year},${d.AGBD},${d.stdAGBD || ''}`).join("\n");
+    const blob = new Blob([headers + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `edgemind-data-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
 
-        <div className="topbar-controls">
+  const handleExportJSON = () => {
+    if (!annualData || annualData.length === 0) return;
+    const exportData = {
+      aoi: aoi,
+      annualData: annualData,
+      stockData: stockData,
+      changeData: changeData
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `edgemind-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  };
+
+  // --- Feature 7: AOI Bookmarks ---
+  const [savedRegions, setSavedRegions] = useState(() => JSON.parse(localStorage.getItem('savedRegions') || '[]'));
+  const [bookmarkName, setBookmarkName] = useState('');
+
+  const saveRegion = () => {
+    if (!aoi) return;
+    const name = bookmarkName || `Region ${savedRegions.length + 1}`;
+    const newRegions = [...savedRegions, { name, aoi }];
+    setSavedRegions(newRegions);
+    localStorage.setItem('savedRegions', JSON.stringify(newRegions));
+    setBookmarkName('');
+  };
+
+  const loadRegion = (region) => {
+    setAoi(region.aoi);
+  };
+
+  return (
+    <div className="dashboard" style={{ display: activeView === 'settings' ? 'none' : 'flex' }}>
+      <Topbar 
+        activeView={activeView}
+        hasUnreadNotifications={false}
+        toggleNotifications={onToggleNotif}
+        aoi={aoi}
+        annualData={annualData}
+        stockData={stockData}
+      />
+
+      <AIChat 
+        aoi={aoi}
+        annualData={annualData}
+        stockData={stockData}
+      />
+
+      {/* ── DASHBOARD CONTROLS ── */}
+      <header className="dashboard-controls glass" style={{ display: isDashboard ? 'flex' : 'none' }}>
+        <div className="dc-left">
           {/* Biomass Map Year */}
           <div className="control-group">
             <label>Biomass Layer Year</label>
@@ -223,11 +282,32 @@ export default function Dashboard({ activeView }) {
             </div>
             <span>Inventory Calibration</span>
           </label>
+        </div>
 
-          {/* Status */}
-          <div className={`status-badge ${useCalibration ? 'emerald' : 'blue'}`}>
-            {useCalibration ? '✓ Calibrated' : '○ Uncalibrated'}
+        <div className="dc-center">
+          {/* Bookmark Manager */}
+          <div className="bookmark-manager">
+            <input 
+              type="text" 
+              placeholder="Name this region..." 
+              value={bookmarkName} 
+              onChange={e => setBookmarkName(e.target.value)}
+              disabled={!aoi}
+            />
+            <button onClick={saveRegion} disabled={!aoi} title="Save AOI">💾 Save</button>
+            <select onChange={(e) => {
+              const r = savedRegions.find(sr => sr.name === e.target.value);
+              if (r) loadRegion(r);
+            }} value="">
+              <option value="" disabled>Load Region...</option>
+              {savedRegions.map((r, i) => <option key={i} value={r.name}>{r.name}</option>)}
+            </select>
           </div>
+        </div>
+
+        <div className="dc-right">
+           <button className="export-btn" onClick={handleExportCSV} disabled={!annualData.length}>CSV</button>
+           <button className="export-btn" onClick={handleExportJSON} disabled={!annualData.length}>JSON</button>
         </div>
       </header>
 

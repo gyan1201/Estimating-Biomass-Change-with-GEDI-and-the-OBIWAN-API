@@ -521,6 +521,83 @@
 .tt-label { color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; }
 
 /* ========== FOOTER ========== */
+/* Dashboard Controls Header */
+.dashboard-controls {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--glass-border-bright);
+}
+
+.dc-left, .dc-center, .dc-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dc-center {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Bookmark Manager */
+.bookmark-manager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}
+.bookmark-manager input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  width: 140px;
+}
+.bookmark-manager button {
+  background: var(--purple);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.bookmark-manager button:disabled { opacity: 0.5; }
+.bookmark-manager select {
+  background: rgba(0,0,0,0.3);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+/* Export Buttons */
+.export-btn {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: var(--blue);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.export-btn:hover:not(:disabled) {
+  background: var(--blue);
+  color: white;
+}
+.export-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .dash-footer {
   display: flex;
   justify-content: space-between;
