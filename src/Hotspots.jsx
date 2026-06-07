@@ -2,16 +2,20 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
-  shadowUrl: markerShadow,
+// Create custom emoji icons to avoid Vite asset bundling issues
+const createIcon = (emoji) => L.divIcon({
+  html: `<div style="font-size: 24px; background: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${emoji}</div>`,
+  className: 'custom-hotspot-icon',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  popupAnchor: [0, -16]
 });
+
+const icons = {
+  loss: createIcon('🔥'),
+  gain: createIcon('🌱'),
+  mixed: createIcon('🔄')
+};
 
 export const HOTSPOTS = [
   {
@@ -47,7 +51,7 @@ export function HotspotMarkers({ onSelect }) {
   return (
     <>
       {HOTSPOTS.map(h => (
-        <Marker key={h.id} position={[h.lat, h.lng]}>
+        <Marker key={h.id} position={[h.lat, h.lng]} icon={icons[h.type]}>
           <Popup>
             <div style={{ padding: '4px', textAlign: 'center' }}>
               <strong style={{ display: 'block', fontSize: '14px', marginBottom: '4px' }}>
