@@ -51,9 +51,9 @@ export default function Sidebar({ activeView, setActiveView, workspaceName = "Bi
         </div>
 
         <button className="user-profile">
-          <div className="avatar">A</div>
+          <div className="avatar">G</div>
           <div className="user-info">
-            <p className="user-name">Alex Researcher</p>
+            <p className="user-name">Gyanendra</p>
             <p className="user-role">Admin</p>
           </div>
           <span className="user-chevron">⚙️</span>
