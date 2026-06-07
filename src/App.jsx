@@ -5,7 +5,6 @@ import Topbar from './Topbar.jsx';
 import CommandPalette from './CommandPalette.jsx';
 import NotificationCenter from './NotificationCenter.jsx';
 import AIChat from './AIChat.jsx';
-import Settings from './Settings.jsx';
 import { SettingsProvider } from './SettingsContext.jsx';
 import './App.css';
 
@@ -53,8 +52,6 @@ export default function App() {
           onOpenCmd={() => setCmdOpen(true)}
           onToggleNotif={() => setNotifOpen(n => !n)}
         />
-
-        {activeView === 'settings' && <Settings />}
       </main>
     </div>
     </SettingsProvider>

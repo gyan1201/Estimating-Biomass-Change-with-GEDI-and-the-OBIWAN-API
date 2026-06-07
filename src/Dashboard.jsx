@@ -9,6 +9,7 @@ import api from './api.js';
 import Visuals from './Visuals.jsx';
 import CompareMap from './CompareMap.jsx';
 import { useSettings } from './SettingsContext.jsx';
+import Settings from './Settings.jsx';
 import KidGuide from './KidGuide.jsx';
 import Glossary from './Glossary.jsx';
 import AIAnalyst from './AIAnalyst.jsx';
@@ -689,6 +690,12 @@ export default function Dashboard({ activeView, onOpenCmd, onToggleNotif }) {
       </footer>
 
       </div>
+      
+      {activeView === 'settings' && (
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <Settings />
+        </div>
+      )}
     </div>
   );
 }
