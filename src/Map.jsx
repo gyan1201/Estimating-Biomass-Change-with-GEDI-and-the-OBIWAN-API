@@ -70,7 +70,14 @@ function BottomLeftControls({ drawing, setDrawing, finishedPoints, clearAoi }) {
           Clear Selection
         </button>
       )}
+    </div>
+  );
+}
 
+function BottomRightControls() {
+  const map = useMap();
+  return (
+    <div className="map-controls" style={{ position: 'absolute', bottom: 30, right: 12, top: 'auto', left: 'auto', zIndex: 1000 }}>
       <button className="map-btn primary" onClick={() => map.flyTo(ALABAMA, 8, { duration: 1.5 })}>
         ✈ Fly to Alabama
       </button>
@@ -154,6 +161,7 @@ export default function Map({ onAoiChange, biomassUrl, useCalibration }) {
           finishedPoints={finishedPoints} 
           clearAoi={clearAoi} 
         />
+        <BottomRightControls />
         <BiomassTileLayer url={biomassUrl} hidden={false} />
         
         {!drawing && <HotspotMarkers onSelect={selectHotspot} />}
