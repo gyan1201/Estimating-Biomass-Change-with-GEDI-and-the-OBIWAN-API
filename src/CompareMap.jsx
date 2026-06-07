@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  MapContainer, TileLayer, Polygon, useMapEvents, useMap
+  MapContainer, TileLayer, Polygon, useMapEvents, useMap, LayersControl, WMSTileLayer
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import api from './api.js';
@@ -181,7 +181,44 @@ export default function CompareMap({ useCalibration, onAoiChange }) {
                     style={{ width: '100%', height: '100%' }}
                     ref={primaryRef}
                   >
-                    <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                    <LayersControl position="topright">
+                      <LayersControl.BaseLayer checked name="Satellite Imagery (Esri)">
+                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+                      </LayersControl.BaseLayer>
+                      
+                      <LayersControl.BaseLayer name="Terrain / Elevation (Esri)">
+                        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}" attribution="Esri Terrain" />
+                      </LayersControl.BaseLayer>
+
+                      <LayersControl.Overlay name="Land Cover 2021 (ESA WorldCover)">
+                        <WMSTileLayer
+                          url="https://services.terrascope.be/wms/v2"
+                          layers="WORLDCOVER_2021_MAP"
+                          format="image/png"
+                          transparent={true}
+                          attribution="ESA WorldCover"
+                          opacity={0.7}
+                        />
+                      </LayersControl.Overlay>
+
+                      <LayersControl.Overlay name="Active Fires (NASA FIRMS / GIBS)">
+                        <WMSTileLayer
+                          url="https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi"
+                          layers="MODIS_Terra_Thermal_Anomalies_All"
+                          format="image/png"
+                          transparent={true}
+                          attribution="NASA GIBS"
+                        />
+                      </LayersControl.Overlay>
+
+                      <LayersControl.Overlay name="Forest Loss (Hansen GFC)">
+                        <TileLayer
+                          url="https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.10/loss_tree_gain/{z}/{x}/{y}.png"
+                          attribution="Hansen/UMD/Google/USGS/NASA"
+                          opacity={0.8}
+                        />
+                      </LayersControl.Overlay>
+                    </LayersControl>
                     <BiomassTile year={yearA} useCalibration={useCalibration} />
                     <SyncPrimary secondaryRef={secondaryRef} />
                     

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, useMapEvents, useMap, LayersControl, WMSTileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import AnimationPlayer from './AnimationPlayer.jsx';
 import { HotspotMarkers } from './Hotspots.jsx';
@@ -144,8 +144,48 @@ export default function Map({ onAoiChange, biomassUrl, changeMapUrl, useCalibrat
         )}
       </div>
 
-      <MapContainer center={ALABAMA} zoom={6} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-        <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+      <MapContainer center={ALABAMA} zoom={7} zoomControl={true} style={{ height: '100%', width: '100%' }}>
+        <LayersControl position="topright">
+          {/* ── BASE LAYERS ── */}
+          <LayersControl.BaseLayer checked name="Satellite Imagery (Esri)">
+            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Esri World Imagery" />
+          </LayersControl.BaseLayer>
+          
+          <LayersControl.BaseLayer name="Terrain / Elevation (Esri)">
+            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}" attribution="Esri Terrain" />
+          </LayersControl.BaseLayer>
+
+          {/* ── OVERLAYS ── */}
+          <LayersControl.Overlay name="Land Cover 2021 (ESA WorldCover)">
+            <WMSTileLayer
+              url="https://services.terrascope.be/wms/v2"
+              layers="WORLDCOVER_2021_MAP"
+              format="image/png"
+              transparent={true}
+              attribution="ESA WorldCover"
+              opacity={0.7}
+            />
+          </LayersControl.Overlay>
+
+          <LayersControl.Overlay name="Active Fires (NASA FIRMS / GIBS)">
+            <WMSTileLayer
+              url="https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi"
+              layers="MODIS_Terra_Thermal_Anomalies_All"
+              format="image/png"
+              transparent={true}
+              attribution="NASA GIBS"
+            />
+          </LayersControl.Overlay>
+
+          <LayersControl.Overlay name="Forest Loss (Hansen GFC)">
+            <TileLayer
+              url="https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.10/loss_tree_gain/{z}/{x}/{y}.png"
+              attribution="Hansen/UMD/Google/USGS/NASA"
+              opacity={0.8}
+            />
+          </LayersControl.Overlay>
+        </LayersControl>
+
         <FlyToAlabama />
         <BiomassTileLayer url={biomassUrl} hidden={false} />
         {changeMapUrl && <TileLayer url={changeMapUrl} opacity={0.7} zIndex={6} />}
